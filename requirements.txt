@@ -1,0 +1,5 @@
+pyobjc-framework-CoreMotion>=12.0
+numpy>=1.26.0
+pandas>=2.0.0
+matplotlib>=3.8.0
+torch>=2.0.0
