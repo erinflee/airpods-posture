@@ -87,7 +87,7 @@ def zscore(sample, baseline, sigma_floor=SIGMA_FLOOR):
     std = baseline['std']
     z_score = {}
     for field in BASELINE_FIELDS:
-        z_score[field] = sample[field] - mean[field] / max(std[field], sigma_floor)
+        z_score[field] = (sample[field] - mean[field]) / max(std[field], sigma_floor)
     return z_score
 
     
