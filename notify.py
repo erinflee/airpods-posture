@@ -10,7 +10,12 @@ def notify(title, message, sound="Glass"):
 
 
 def main():
-    """Send notification — quick manual test of notify()."""
+    """Send notification — quick manual test of notify().
+    
+    I need to add base cases -> not guaranteed head is always leaning forward.
+    Possible for head to be tilted forward, backward, sideways, etc. I need to
+    account for this when using notify() during detection.
+    """
     notify("Posture Check 🦒", "Your head's leaning forward — ease your chin back!")
 
 if __name__ == "__main__":
