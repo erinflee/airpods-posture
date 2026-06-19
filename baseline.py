@@ -13,9 +13,6 @@ All orientation values are radians (Core Motion's native unit); gravity is in g.
 import json
 import statistics
 
-# Bumped to 2: baseline now stores per-axis std (σ), not just means.
-BASELINE_VERSION = 2
-
 # Orientation + gravity define "neutral posture". acceleration / rotationRate
 # are motion (mean ~0 at rest), so they are not part of the posture reference.
 BASELINE_FIELDS = ("pitch", "roll", "yaw", "gravityX", "gravityY", "gravityZ")
@@ -34,16 +31,24 @@ def mean_std_fields(samples):
     mac_motion. For each field, compute the mean (μ) and population std (σ).
     calibrate.py calls this after recording ~10 s of neutral posture.
     """
+    means = {}
+    stds = {}
+
+    for field in BASELINE_FIELDS:
+        values = [sample[field] for sample in samples]
+        means[field] = statistics.fmean(values)
+        stds[field] = statistics.pstdev(values)
+
+    return (means, stds)
 
 
 def save_baseline(means, stds, sample_count, duration_s, path):
     """Write baseline.json (version 2: mean + std per field) to path."""
     data = {
-        "version": BASELINE_VERSION,
         "sample_count": sample_count,
         "duration_s": duration_s,
-        "mean": {f: means[f] for f in BASELINE_FIELDS},
-        "std": {f: stds[f] for f in BASELINE_FIELDS},
+        "mean": {field: means[field] for field in BASELINE_FIELDS},
+        "std": {field: stds[field] for field in BASELINE_FIELDS},
     }
     with open(path, "w", encoding='utf-8') as file:
         json.dump(data, file, indent=2)
@@ -51,14 +56,9 @@ def save_baseline(means, stds, sample_count, duration_s, path):
 
 
 def load_baseline(path):
-    """Read baseline.json from path; raise if version mismatches."""
+    """Read baseline.json from path."""
     with open(path, 'r', encoding='utf-8') as file:
         data = json.load(file)
-    version = data.get("version")
-    if version != BASELINE_VERSION:
-        raise ValueError(
-            f"baseline.json version {version} != {BASELINE_VERSION}; re-run calibrate.py"
-        )
     return data
 
 
@@ -70,7 +70,7 @@ def apply_baseline(sample, baseline):
     keeps the physical, interpretable unit ("X rad / degrees past neutral").
     """
     mean = baseline["mean"]
-    out = dict(sample)
+    out = {}
     for field in BASELINE_FIELDS:
         out[field] = sample[field] - mean[field]
     return out
@@ -83,4 +83,11 @@ def zscore(sample, baseline, sigma_floor=SIGMA_FLOOR):
     shared model learns *deviation patterns*, not anatomy. ML lane only — the
     Tier 1 threshold uses apply_baseline() in raw radians instead.
     """
+    mean = baseline['mean']
+    std = baseline['std']
+    z_score = {}
+    for field in BASELINE_FIELDS:
+        z_score[field] = sample[field] - mean[field] / max(std[field], sigma_floor)
+    return z_score
+
     
