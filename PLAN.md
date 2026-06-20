@@ -86,11 +86,13 @@ This is the non-negotiable for the cross-user claim. Random cross-validation on 
 
 Work through these in order. Check items off as you go.
 
+> **Status (code vs. checklist).** The checklist tracks *tasks* (build / tune / record / test), most of which need real AirPods or recorded data. Code already written and verified offline: `mac_motion.py`, `config.py`, `baseline.py`, `calibrate.py`, `notify.py`, `detectors.py` (Tier 1), `state_machine.py`, `run_daemon.py`. Still stubs: `record_mac.py`, `eval_detectors.py`, `features.py`, `inspect_data.py`, `dataset.py`, `model.py`, `train.py`. Nothing has been run on hardware yet, so the tune/record/test items below stay unchecked.
+
 ### 1. Sensor & calibration
 
-- [ ] Build `AirpodsPosture.app` (`./scripts/build_app.sh`)
+- [x] Build `AirpodsPosture.app` (`./scripts/build_app.sh`)
 - [ ] `record_mac.py` — log motion to CSV via the bundle
-- [ ] `calibrate.py` + `baseline.py` — ~10 s neutral baseline → `baseline.json` (per-axis μ and σ)
+- [x] `calibrate.py` + `baseline.py` — ~10 s neutral baseline → `baseline.json` (per-axis μ and σ) *(code done + unit-tested; `baseline.json` not yet generated on real AirPods)*
 - [ ] Optional: `inspect_stream.py` — sample rate, live feature summary
 
 ### 2. Tier 1 — threshold detector (ships day one)
