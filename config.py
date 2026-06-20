@@ -35,13 +35,14 @@ CLASS_PREFIX_TO_ID = {
 NUM_CLASSES = len(CLASS_PREFIX_TO_ID)
 
 # --- Tier 1 pitch threshold ---
+# tilting head down -> pitch value becomes negative
 PITCH_SLOUCH_THRESHOLD = -0.15 # radians (Core Motion's unit); -0.15 rad ≈ -8.6°
 SMOOTHING_WINDOW = 5
 
 # --- Live daemon timing ---
 INFERENCE_HZ = 2
 SLOUCH_HOLD_S = 15
-ALERT_COOLDOWN_S = 60
+MIN_GAP_ALERT_S = 60
 
 # --- Training defaults (Tier 3) ---
 EPOCHS = 50
