@@ -1,0 +1,8 @@
+AirpodsPosture.app/
+baseline.json
+data/
+__pycache__/
+*.pyc
+.Python
+.venv/
+venv/
