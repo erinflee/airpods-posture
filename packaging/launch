@@ -1,0 +1,32 @@
+#!/bin/bash
+# Bundle MAIN executable (CFBundleExecutable). Sets up the embedded interpreter
+# and runs the requested project script.
+#
+# IMPORTANT: launch this app via `open` (LaunchServices), NOT by invoking this
+# script straight from a terminal. macOS TCC blames the "responsible process"
+# for a privacy request; a terminal child is blamed on the terminal app (e.g.
+# VS Code / Terminal), which has no NSMotionUsageDescription and gets SIGABRT'd.
+# `open AirpodsPosture.app --args calibrate.py` makes the app responsible for
+# itself, so TCC reads THIS bundle's Info.plist and shows the Motion prompt.
+#
+# PYTHONHOME points the embedded interpreter at its real stdlib/site-packages.
+
+set -e
+
+HERE="$(cd "$(dirname "$0")" && pwd)"
+APP_ROOT="$(cd "$HERE/../../.." && pwd)"
+SCRIPT="${1:-run_daemon.py}"
+
+export PYTHONHOME="@PYHOME@"
+export PYTHONNOUSERSITE=1
+export PYTHONUNBUFFERED=1   # so `tail -f last_run.log` shows progress live
+
+cd "$APP_ROOT"
+
+# Launched via `open` there is no terminal, so tee output to a log the caller
+# can read back (e.g. the calibration Hz line). Interactive runs still print.
+if [ -t 1 ]; then
+    exec "$HERE/python3" "$APP_ROOT/$SCRIPT" "${@:2}"
+else
+    exec "$HERE/python3" "$APP_ROOT/$SCRIPT" "${@:2}" > "$APP_ROOT/last_run.log" 2>&1
+fi
