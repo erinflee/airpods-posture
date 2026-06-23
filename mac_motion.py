@@ -20,15 +20,15 @@ def _motion_to_sample(motion):
         "pitch": attitude.pitch(), # chin up/down movement
         "roll": attitude.roll(), # ear to shoulder
         "yaw": attitude.yaw(), # face look side 
-        "accelerationX": accel.x(), # sudden linear movement
-        "accelerationY": accel.y(),
-        "accelerationZ": accel.z(),
-        "rotationRateX": gyro.x(), # how fast is rotation
-        "rotationRateY": gyro.y(),
-        "rotationRateZ": gyro.z(),
-        "gravityX": gravity.x(), # helps us understand which way is down
-        "gravityY": gravity.y(),
-        "gravityZ": gravity.z(),
+        "accelerationX": accel.x, # sudden linear movement
+        "accelerationY": accel.y,
+        "accelerationZ": accel.z,
+        "rotationRateX": gyro.x, # how fast is rotation
+        "rotationRateY": gyro.y,
+        "rotationRateZ": gyro.z,
+        "gravityX": gravity.x, # helps us understand which way is down
+        "gravityY": gravity.y,
+        "gravityZ": gravity.z,
     }
 
 
