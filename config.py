@@ -40,7 +40,7 @@ PITCH_SLOUCH_THRESHOLD = -0.15 # radians (Core Motion's unit); -0.15 rad ≈ -8.
 SMOOTHING_WINDOW = 5
 
 # --- Live daemon timing ---
-INFERENCE_HZ = 2
+INFERENCE_HZ = 2 # two recorded per second -> every 0.5 sec, we record some angle
 SLOUCH_HOLD_S = 15
 MIN_GAP_ALERT_S = 60
 
