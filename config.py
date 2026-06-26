@@ -41,8 +41,9 @@ SMOOTHING_WINDOW = 5
 
 # --- Live daemon timing ---
 INFERENCE_HZ = 2 # two recorded per second -> every 0.5 sec, we record some angle
-SLOUCH_HOLD_S = 15
-MIN_GAP_ALERT_S = 60
+SLOUCH_HOLD_S = 5
+MIN_GAP_ALERT_S = 3
+ALERT_MOTION_PAUSE_S = 5  # stop motion after alert; resume cleanly when audio settles
 
 # --- Training defaults (Tier 3) ---
 EPOCHS = 50
