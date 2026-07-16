@@ -29,7 +29,9 @@ open "$APP" --args "$@"             # launch detached so TCC blames the app
 
 tail -f "$LOG" &                    # stream output to this terminal
 TAILPID=$!
-trap 'kill "$TAILPID" 2>/dev/null' EXIT
+# On exit (incl. Ctrl+C) kill BOTH the tail AND the detached app — `open`
+# detaches the daemon from this shell, so Ctrl+C alone would leave it running.
+trap 'kill "$TAILPID" 2>/dev/null; pkill -f "$PYPROC" 2>/dev/null' EXIT INT TERM
 
 sleep 1
 while pgrep -f "$PYPROC" >/dev/null; do sleep 0.5; done
