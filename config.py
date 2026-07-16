@@ -1,32 +1,32 @@
-"""Project constants. Other files import settings from here."""
+"""Shared constants."""
 
 from pathlib import Path
 
-# --- Paths ---
+# Paths
 ROOT = Path(__file__).resolve().parent
 DATA_DIR = ROOT / "data"
 WEIGHTS_DIR = ROOT / "weights"
 BASELINE_PATH = ROOT / "baseline.json"
 MODEL_PATH = WEIGHTS_DIR / "posture_model.pth"
 
-# --- Sliding windows (ML tiers only) ---
-WINDOW_SIZE = 100 # ~2 s at 50 Hz
+# Sliding windows (ML tiers only)
+WINDOW_SIZE = 100 # ~2s at 50Hz
 WINDOW_STRIDE = 25 # ~75% overlap
 
-# CSV column names from record_mac.py
+# CSV columns from record_mac.py
 FEATURE_FIELDS = [
-    "roll", # tilt ear toward shoulder
+    "roll", # ear-to-shoulder tilt
     "pitch", # chin up/down
-    "yaw", # turn head left/right
-    "accelerationX", # sudden linear move (x)
-    "accelerationY", # sudden linear move (y)
-    "accelerationZ", # sudden linear move (z)
-    "rotationRateX", # how fast roll changes
-    "rotationRateY", # how fast pitch changes
-    "rotationRateZ", # how fast yaw changes
+    "yaw", # head turn
+    "accelerationX",
+    "accelerationY",
+    "accelerationZ",
+    "rotationRateX",
+    "rotationRateY",
+    "rotationRateZ",
 ]
 
-# --- Class labels (from filename prefix, e.g. forward_01.csv -> 1) ---
+# Class label from filename prefix (forward_01.csv -> 1)
 CLASS_PREFIX_TO_ID = {
     "neutral": 0,
     "forward": 1,
@@ -34,18 +34,29 @@ CLASS_PREFIX_TO_ID = {
 }
 NUM_CLASSES = len(CLASS_PREFIX_TO_ID)
 
-# --- Tier 1 pitch threshold ---
-# tilting head down -> pitch value becomes negative
-PITCH_SLOUCH_THRESHOLD = -0.15 # radians (Core Motion's unit); -0.15 rad ≈ -8.6°
+# Tier 1 pitch threshold. Negative because chin-down = negative pitch.
+PITCH_SLOUCH_THRESHOLD = -0.15 # rad (-0.15 ≈ -8.6°)
 SMOOTHING_WINDOW = 5
 
-# --- Live daemon timing ---
-INFERENCE_HZ = 2 # two recorded per second -> every 0.5 sec, we record some angle
+# Live daemon timing
+INFERENCE_HZ = 2 # one sample per 0.5s
 SLOUCH_HOLD_S = 5
 MIN_GAP_ALERT_S = 3
-ALERT_MOTION_PAUSE_S = 5  # stop motion after alert; resume cleanly when audio settles
 
-# --- Training defaults (Tier 3) ---
+# Screen-edge border alert
+BORDER_THICKNESS = 14 # points
+BORDER_COLOR = (0.85, 0.1, 0.1, 0.92) # RGBA 0-1, translucent red
+
+# Banner alert. We draw our own; a real Notification Center banner kills motion.
+BANNER_WIDTH = 360      # points
+BANNER_HEIGHT = 88
+BANNER_MARGIN = 20      # gap from top-right corner
+BANNER_DURATION_S = 4   # auto-dismiss
+
+# Alert sound via afplay. Plain playback is motion-safe.
+ALERT_SOUND = "/System/Library/Sounds/Glass.aiff"
+
+# Training defaults (Tier 3)
 EPOCHS = 50
 BATCH_SIZE = 32
 LEARNING_RATE = 0.001
