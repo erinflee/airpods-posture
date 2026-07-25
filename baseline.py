@@ -1,35 +1,29 @@
 """
-Helpers for baseline.json — this user's personal *neutral* posture reference.
+Read/write baseline.json, the user's neutral posture reference.
 
-calibrate.py collects ~10 s of motion dicts from mac_motion, then calls
-mean_std_fields() and save_baseline() here. Later, record_mac.py / train.py /
-run_daemon.py call load_baseline() plus:
-  - apply_baseline() -> Tier 1 threshold: raw delta from neutral (radians)
-  - zscore() -> Tiers 2-3 model: (x - μ) / σ, anatomy-invariant
+calibrate.py records ~10s of motion and saves μ/σ per field. The rest load it
+back and either:
+  apply_baseline() - Tier 1: raw delta from neutral (radians)
+  zscore()         - Tiers 2-3: (x - μ) / σ, anatomy-invariant
 
-All orientation values are radians (Core Motion's native unit); gravity is in g.
+Orientation is in radians; gravity in g.
 """
 
 import json
 import statistics
 
-# Orientation + gravity define "neutral posture". acceleration / rotationRate
-# are motion (mean ~0 at rest), so they are not part of the posture reference.
+# Orientation + gravity define posture. Acceleration/rotationRate average ~0 at
+# rest, so they're excluded.
 BASELINE_FIELDS = ("pitch", "roll", "yaw", "gravityX", "gravityY", "gravityZ")
 
-# σ can be ~0 if the user sits very still during calibration; dividing by it
-# would explode z-scores into noise. Floor every std to this minimum.
-# NOTE: calibration σ is "stillness noise", not "normal working wiggle". If
-# z-scores feel too hot, recompute σ from the neutral *recording* instead.
+# Floor for σ. If the user sits perfectly still, σ ≈ 0 and z-scores blow up.
 SIGMA_FLOOR = 1e-3
 
 
 def mean_std_fields(samples):
-    """Return (means, stds) dicts over BASELINE_FIELDS for a list of samples.
+    """Return (means, stds) dicts over BASELINE_FIELDS.
 
-    samples is a list like [{"pitch": -0.48, "roll": 0.01, ...}, ...] from
-    mac_motion. For each field, compute the mean (μ) and population std (σ).
-    calibrate.py calls this after recording ~10 s of neutral posture.
+    samples is a list of motion dicts. Uses mean and population std per field.
     """
     means = {}
     stds = {}
@@ -43,7 +37,7 @@ def mean_std_fields(samples):
 
 
 def save_baseline(means, stds, sample_count, duration_s, path):
-    """Write baseline.json (version 2: mean + std per field) to path."""
+    """Write baseline.json (mean + std per field) to path."""
     data = {
         "sample_count": sample_count,
         "duration_s": duration_s,
@@ -63,11 +57,10 @@ def load_baseline(path):
 
 
 def apply_baseline(sample, baseline):
-    """Tier 1 — raw delta from neutral, in radians.
+    """Tier 1: raw delta from neutral, in radians.
 
-    Return a copy of sample with each BASELINE_FIELD replaced by
-    (value - μ). The threshold detector reads pitch delta in radians; this
-    keeps the physical, interpretable unit ("X rad / degrees past neutral").
+    Copy of sample with each BASELINE_FIELD replaced by (value - μ). Keeps the
+    interpretable unit for the pitch threshold detector.
     """
     mean = baseline["mean"]
     out = {}
@@ -77,11 +70,10 @@ def apply_baseline(sample, baseline):
 
 
 def zscore(sample, baseline, sigma_floor=SIGMA_FLOOR):
-    """Tiers 2-3 — per-axis z-score: (x - μ) / max(σ, floor).
+    """Tiers 2-3: per-axis z-score, (x - μ) / max(σ, floor).
 
-    Strips out each user's neutral offset (μ) and movement scale (σ) so one
-    shared model learns *deviation patterns*, not anatomy. ML lane only — the
-    Tier 1 threshold uses apply_baseline() in raw radians instead.
+    Removes each user's neutral offset and movement scale so one shared model
+    learns deviation patterns, not anatomy. ML lane only.
     """
     mean = baseline['mean']
     std = baseline['std']
