@@ -1,18 +1,18 @@
 """
-Rule-based posture detectors (Tier 1, before the ML tiers).
+Rule-based posture detectors (Tier 1).
 
-  - pitch_only_label —> Baseline A: raw pitch threshold
-  - SmoothedPitchClassifier —> Baseline B: same, majority-voted over last N labels
+  - pitch_only_label       Baseline A: raw pitch threshold
+  - SmoothedPitchClassifier Baseline B: same, majority-voted over last N labels
 """
 
 from config import PITCH_SLOUCH_THRESHOLD, SMOOTHING_WINDOW
 
 
 def pitch_only_label(pitch_delta):
-    """Label one sample: 1 (forward) if pitch_delta is past the threshold, else 0.
+    """1 (forward) if pitch_delta is past the threshold, else 0.
 
-    Threshold is negative because chin-down flexion drives pitch below neutral.
-    pitch_delta is pitch - baseline mean, in radians (from apply_baseline).
+    Threshold is negative (chin-down drives pitch below neutral). pitch_delta is
+    pitch - baseline mean, in radians.
     """
     if pitch_delta < PITCH_SLOUCH_THRESHOLD:
         return 1
@@ -20,28 +20,27 @@ def pitch_only_label(pitch_delta):
 
 
 class SmoothedPitchClassifier:
-    """Baseline B —> pitch threshold smoothed by majority vote over the last N labels.
+    """Baseline B: pitch threshold, majority-voted over the last N labels.
 
-    De-noises pitch_only_label so a single noisy sample near the threshold
-    doesn't flip the output. N defaults to SMOOTHING_WINDOW.
+    Stops a single noisy sample near the threshold from flipping the output.
+    N defaults to SMOOTHING_WINDOW.
     """
 
     def __init__(self, window=SMOOTHING_WINDOW):
-        """Store the window size and an empty buffer of recent labels."""
         self._window = window
         self._buffer = []
 
     def predict(self, pitch_delta):
-        """Return the majority label (0/1) over the last N samples."""
+        """Majority label (0/1) over the last N samples."""
         label = pitch_only_label(pitch_delta)
         self._buffer.append(label)
         self._buffer = self._buffer[-self._window:]
 
         if sum(self._buffer) > len(self._buffer) / 2:
-            return 1  # more forward labels in the window
-        return 0 # more neutral labels in the window
+            return 1
+        return 0
 
     def reset(self):
-        """Clear the buffer so a new file/session starts with no memory."""
+        """Clear the buffer between files/sessions."""
         self._buffer = []
 
