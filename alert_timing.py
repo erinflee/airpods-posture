@@ -1,28 +1,27 @@
-"""Alert timing —> decides WHEN to fire a posture notification."""
+"""Alert timing: decides WHEN to fire a posture alert."""
 from config import SLOUCH_HOLD_S, MIN_GAP_ALERT_S
 import time
 
 
 class PostureStateMachine:
-    """Fire only after forward flexion is held SLOUCH_HOLD_S AND MIN_GAP_ALERT_S
-    has passed since the last alert. Neutral resets the hold, so brief sips and
-    glances never reach it. Decides whether to alert, not how (caller notifies).
+    """Fire only after forward flexion is held SLOUCH_HOLD_S and MIN_GAP_ALERT_S
+    has passed since the last alert. Neutral resets the hold, so brief glances
+    never trigger. Decides whether to alert, not how.
     """
 
     def __init__(self):
-        """Both timers start off (None = not slouching / never alerted)."""
-        self._start = None # when the current forward stretch began
-        self._last_alert = None # when we last fired, for the min-gap check
+        self._start = None # start of the current forward stretch
+        self._last_alert = None # last fire time, for the min-gap check
 
     def update(self, predicted_class, now=None):
-        """Feed one prediction (1 = forward) -> return True if an alert should fire.
+        """Feed one prediction (1 = forward); return True if an alert should fire.
 
-        now defaults to time.monotonic() -> pass recorded timestamps for CSV eval.
+        now defaults to time.monotonic(); pass recorded timestamps for CSV eval.
         """
         if now is None:
             now = time.monotonic()
 
-        # Neutral → cancel the hold timer; never fires.
+        # Neutral cancels the hold timer.
         if predicted_class != 1:
             self._start = None
             return False
@@ -39,5 +38,5 @@ class PostureStateMachine:
         return False
 
     def reset(self):
-        """Clear both timers — use between files/sessions."""
+        """Clear both timers between files/sessions."""
         self._start = None
