@@ -1,8 +1,19 @@
+# macOS
+.DS_Store
+
+# Logs
+*.log
+
+# Build artifacts
 AirpodsPosture.app/
-baseline.json
-data/
 __pycache__/
 *.pyc
 .Python
+
+# Virtual environments
 .venv/
 venv/
+
+# Per-user data (not shipped)
+baseline.json
+data/
