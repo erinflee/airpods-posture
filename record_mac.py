@@ -36,8 +36,8 @@ def main():
     else:
         n = 1
         while True:
-            output = DATA_DIR / f"{arg.label}_{n:02d}.csv"
-            if not output.exist():
+            output = DATA_DIR / f"{args.label}_{n:02d}.csv"
+            if not output.exists():
                 break
             n += 1
     print(f"Recording {args.label} for {args.duration:.0f}s -> {output}")
