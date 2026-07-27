@@ -60,8 +60,13 @@ def main():
     if len(samples) < 1:
         print("Error: no samples collected - is the stream working?")
         return 1
-     
-     
+
+    fieldnames = list(samples[0].keys())
+    with output.open("w", newline="") as file:
+        writer = csv.DictWriter(file, fieldnames=fieldnames)
+        writer.writeheader()
+        writer.writerows(samples)
+
     return 0
 
 
