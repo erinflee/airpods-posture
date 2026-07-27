@@ -57,6 +57,9 @@ def main():
     reader.start(on_sample)
     reader.run_until_stopped()
      
+    if len(samples) < 1:
+        print("Error: no samples collected - is the stream working?")
+        return 1
      
      
     return 0
