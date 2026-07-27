@@ -41,12 +41,23 @@ def main():
                 break
             n += 1
     print(f"Recording {args.label} for {args.duration:.0f}s -> {output}")
-    return 0
 
+    samples = []
+    start = time.monotonic()
     reader = HeadphoneMotionReader()
     if not reader.available():
         print("Error: AirPods motion not available...")
         return 1
+
+    def on_sample(sample):
+        samples.append(sample)
+        if time.monotonic() - start >= args.duration:
+            reader.stop()
+     
+     
+     
+    return 0
+
 
 
 
