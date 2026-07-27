@@ -8,16 +8,14 @@ Record AirPods motion to CSV. Run via AirpodsPosture.app.
   - main() entrypoint
 """
 
+import argparse
 import csv
 import sys
 import time
-import argparse
+from pathlib import Path
+
 from airpods_motion import HeadphoneMotionReader
-from config import DATA_DIR, CLASS_PREFIX_TO_ID
-
-
-
-
+from config import CLASS_PREFIX_TO_ID, DATA_DIR
 
 
 def main():
@@ -30,6 +28,19 @@ def main():
     parser.add_argument("--output", type=Path, default=None)
     args = parser.parse_args()
 
+
+    DATA_DIR.mkdir(exist_ok=True)
+    if args.output is not None:
+        output = args.output
+
+    else:
+        n = 1
+        while True:
+            output = DATA_DIR / f"{arg.label}_{n:02d}.csv"
+            if not output.exist():
+                break
+            n += 1
+    print(f"Recording {args.label} for {args.duration:.0f}s -> {output}")
     return 0
 
 
