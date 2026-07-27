@@ -1,5 +1,5 @@
 """
-Record AirPods motion to CSV. Run via AirpodsPosture.app.
+Record AirPods motion to CSV. Run via AirpodsPosture.app. 
 
   - CLI: --label (good/slouch/dynamic), --duration, --output
   - open CSV with motion columns (time_ns, pitch, roll, yaw, accel, gyro, gravity)
@@ -8,11 +8,7 @@ Record AirPods motion to CSV. Run via AirpodsPosture.app.
   - main() entrypoint
 """
 
-import argparse
-import csv
-import sys
-import time
-from pathlib import Path
-
-from airpods_motion import HeadphoneMotionReader
+from airpods_motion import _motion_to_sample
 from config import DATA_DIR, CLASS_PREFIX_TO_ID
+
+
