@@ -53,6 +53,9 @@ def main():
         samples.append(sample)
         if time.monotonic() - start >= args.duration:
             reader.stop()
+
+    reader.start(on_sample)
+    reader.run_until_stopped()
      
      
      
