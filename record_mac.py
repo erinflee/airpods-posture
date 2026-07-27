@@ -8,6 +8,10 @@ Record AirPods motion to CSV. Run via AirpodsPosture.app.
   - main() entrypoint
 """
 
+import csv
+import sys
+import time
+import argparse
 from airpods_motion import _motion_to_sample
 from config import DATA_DIR, CLASS_PREFIX_TO_ID
 
