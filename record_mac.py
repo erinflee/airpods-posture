@@ -43,6 +43,11 @@ def main():
     print(f"Recording {args.label} for {args.duration:.0f}s -> {output}")
     return 0
 
+    reader = HeadphoneMotionReader()
+    if not reader.available():
+        print("Error: AirPods motion not available...")
+        return 1
+
 
 
 if __name__ == "__main__":
