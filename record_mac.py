@@ -67,6 +67,8 @@ def main():
         writer.writeheader()
         writer.writerows(samples)
 
+    hz = len(samples) / args.duration
+    print(f"Saved {len(samples)} samples to {output} (~{hz:.0f} hz)")
     return 0
 
 
