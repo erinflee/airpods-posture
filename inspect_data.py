@@ -11,7 +11,7 @@ import csv
 import sys
 from pathlib import Path
 
-import matplotlib.pyploy as plt
+import matplotlib.pyplot as plt
 from statistics import fmean, pstdev
 from config import BASELINE_PATH, DATA_DIR, CLASS_PREFIX_TO_ID
 
