@@ -32,38 +32,29 @@ def label_from_filename(path):
 def summarize_file(path, baseline):
     rows = load_csv(path)
     prefix = label_from_filename(path)
+    baseline_mean_pitch = baseline["mean"]["pitch"]
     data = {
-        "pitch" : [],
+        "pitch": [],
         "roll": [], 
         "delta_pitch": []
     }
-    stats = {}    
+
     for row in rows: 
         data["pitch"].append(float(row["pitch"]))
         data["roll"].append(float(row["roll"]))
-        data["delta_pitch"].append(float(row["pitch"]) - baseline["mean"]["pitch"])
+        data["delta_pitch"].append(float(row["pitch"]) - baseline_mean_pitch)
 
-
-    pitch_mean = fmean(data["pitch"])
-    roll_mean = fmean(data["roll"])
-    delta_pitch_mean = fmean(data["delta_pitch"])
-    
-    pitch_std = pstdev(data["pitch"])
-    roll_std = pstdev(data["roll"])
-    delta_pitch_std = pstdev(data["delta_pitch"])
-
-    stats["sample_count"] = len(rows)
-    stats["label"] = prefix
-    stats["pitch_mean"] = pitch_mean
-    stats["roll_mean"] = roll_mean
-    stats["delta_pitch_mean"] = delta_pitch_mean
-    stats["pitch_std"] = pitch_std
-    stats["roll_std"] = roll_std
-    stats["delta_pitch_std"] = delta_pitch_std
-
+    stats = {
+        "sample_count": len(rows),
+        "label": prefix,
+        "pitch_mean": fmean(data["pitch"]),
+        "roll_mean": fmean(data["roll"]),
+        "delta_pitch_mean": fmean(data["delta_pitch"]),
+        "pitch_std": pstdev(data["pitch"]),
+        "roll_std": pstdev(data["roll"]),
+        "delta_pitch_std": pstdev(data["delta_pitch"]),
+    }
     return stats
-
-
 
 
 
