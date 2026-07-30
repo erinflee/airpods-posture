@@ -14,7 +14,7 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 from statistics import fmean, pstdev
 from baseline import load_baseline
-from config import BASELINE_PATH, DATA_DIR, CLASS_PREFIX_TO_ID
+from config import BASELINE_PATH, DATA_DIR, CLASS_PREFIX_TO_ID, ROOT
 
 def load_csv(csv_path):
     with open(csv_path, 'r', newline="", encoding="utf-8") as file:
