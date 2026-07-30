@@ -39,7 +39,7 @@ def summarize_file(path, baseline):
     for row in rows: 
         pitch.append(float(row["pitch"]))
         roll.append(float(row["roll"]))
-        pitch_delta.append(float(row["pitch"]) - float(baseline["mean"]["pitch"]))
+        delta_pitch.append(float(row["pitch"]) - float(baseline["mean"]["pitch"]))
 
     pitch_mean = statistics.fmean(pitch)
     roll_mean = statistics.fmean(roll)
