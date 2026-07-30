@@ -32,18 +32,21 @@ def label_from_filename(path):
 def summarize_file(path, baseline):
     rows = load_csv(path)
     prefix = label_from_filename(path)
-    pitch = []
-    roll = []
-    delta_pitch = []
+    data = {
+        "pitch" : [],
+        "roll": [], 
+        "delta_pitch": []
+    }
     stats = {}    
     for row in rows: 
-        pitch.append(float(row["pitch"]))
-        roll.append(float(row["roll"]))
-        delta_pitch.append(float(row["pitch"]) - float(baseline["mean"]["pitch"]))
+        data["pitch"].append(float(row["pitch"]))
+        data["roll"].append(float(row["roll"]))
+        data["delta_pitch"].append(float(row["pitch"]) - baseline["mean"]["pitch"])
 
-    pitch_mean = fmean(pitch)
-    roll_mean = fmean(roll)
-    delta_pitch_mean = fmean(delta_pitch)
+
+    pitch_mean = fmean(data.(pitch))
+    roll_mean = fmean(data.get(roll))
+    delta_pitch_mean = fmean(data.get(delta_pitch))
     
     pitch_std = pstdev(pitch)
     roll_std = pstdev(roll)
