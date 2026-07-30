@@ -13,6 +13,7 @@ from pathlib import Path
 
 import matplotlib.pyplot as plt
 from statistics import fmean, pstdev
+from baseline import load_baseline
 from config import BASELINE_PATH, DATA_DIR, CLASS_PREFIX_TO_ID
 
 def load_csv(csv_path):
@@ -120,5 +121,4 @@ def main():
         print(f"sanity: forward delta_pitch mean more negative than neutral? {ok}")
 
     return 0
-
 
