@@ -88,3 +88,37 @@ def plot_file(path, baseline, out_dir):
     plt.close(fig)
 
 
+def main():
+    parser = argparse.ArgumentParser(description="Summarize and plot posture CSV recordings")
+    parser.add_argument("--data-dir", type=Path, default=DATA_DIR)
+    parser.add_argument("--baseline", type=Path, default=BASELINE_PATH)
+    parser.add_argument("--plot", action="store_true", help="Save pitch/roll PNGs to results/")
+    args = parser.parse_args()
+
+    baseline = load_baseline(args.baseline)
+    csv_files = sorted(args.data_dir.glob("*.csv"))
+    if not csv_files:
+        print(f"No CSV files in {args.data_dir}", file=sys.stderr)
+        return 1
+
+    delta_pitch_by_label = {}
+    for csv_path in csv_files:
+        stats = summarize_file(csv_path, baseline)
+        print(
+            f"{csv_path.name}: "
+            f"samples={stats['sample_count']} label={stats['label']} "
+            f"pitch_mean={stats['pitch_mean']:.4f} roll_mean={stats['roll_mean']:.4f} "
+            f"delta_pitch_mean={stats['delta_pitch_mean']:.4f} "
+            f"pitch_std={stats['pitch_std']:.4f} roll_std={stats['roll_std']:.4f}"
+        )
+        delta_pitch_by_label[stats["label"]] = stats["delta_pitch_mean"]
+        if args.plot:
+            plot_file(csv_path, baseline, ROOT / "results")
+
+    if "forward" in delta_pitch_by_label and "neutral" in delta_pitch_by_label:
+        ok = delta_pitch_by_label["forward"] < delta_pitch_by_label["neutral"]
+        print(f"sanity: forward delta_pitch mean more negative than neutral? {ok}")
+
+    return 0
+
+
