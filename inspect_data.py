@@ -41,13 +41,13 @@ def summarize_file(path, baseline):
         roll.append(float(row["roll"]))
         delta_pitch.append(float(row["pitch"]) - float(baseline["mean"]["pitch"]))
 
-    pitch_mean = statistics.fmean(pitch)
-    roll_mean = statistics.fmean(roll)
-    delta_pitch_mean = statistics.fmean(delta_pitch)
+    pitch_mean = fmean(pitch)
+    roll_mean = fmean(roll)
+    delta_pitch_mean = fmean(delta_pitch)
     
-    pitch_std = statistics.pstdev(pitch)
-    roll_std = statistics.pstdev(roll)
-    delta_pitch_std = statistics.pstdev(delta_pitch)
+    pitch_std = pstdev(pitch)
+    roll_std = pstdev(roll)
+    delta_pitch_std = pstdev(delta_pitch)
 
     stats["sample_count"] = len(rows)
     stats["label"] = prefix
