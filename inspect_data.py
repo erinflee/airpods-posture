@@ -57,5 +57,34 @@ def summarize_file(path, baseline):
     return stats
 
 
+def plot_file(path, baseline, out_dir):
+    rows = load_csv(path)
+    baseline_mean_pitch = baseline["mean"]["pitch"]
+
+    pitch = [float(row["pitch"]) for row in rows]
+    roll = [float(row["roll"]) for row in rows]
+    delta_pitch = [p - baseline_mean_pitch for p in pitch]
+    x = list(range(len(rows)))
+
+    out_dir = Path(out_dir)
+    out_dir.mkdir(parents=True, exist_ok=True)
+
+    fig, axes = plt.subplots(3, 1, figsize=(10, 8), sharex=True)
+    stem = Path(path).stem
+
+    axes[0].plot(x, delta_pitch)
+    axes[0].set_ylabel("delta pitch (rad)")
+    axes[0].set_title(stem)
+
+    axes[1].plot(x, pitch)
+    axes[1].set_ylabel("pitch (rad)")
+
+    axes[2].plot(x, roll)
+    axes[2].set_ylabel("roll (rad)")
+    axes[2].set_xlabel("sample index")
+
+    fig.tight_layout()
+    fig.savefig(out_dir / f"{stem}.png")
+    plt.close(fig)
 
 
