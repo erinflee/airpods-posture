@@ -31,6 +31,6 @@ def pitch_deltas(path, baseline):
     pitch_deltas = []
     baseline_mean_pitch = baseline["mean"].get("pitch")
     for row in rows:
-        pitch_deltas.append(row['pitch'] - baseline_mean_pitch)
+        pitch_deltas.append(float(row['pitch']) - baseline_mean_pitch)
 
     return pitch_deltas
