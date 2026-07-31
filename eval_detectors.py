@@ -16,3 +16,10 @@ from config import BASELINE_PATH, CLASS_PREFIX_TO_ID, DATA_DIR
 from pitch_director import SmoothedPitchClassifier, pitch_only_label
 
 
+def truth_label(path):
+    stem = Path(path).stem
+    prefix = stem.split("_")[0]
+    if prefix in CLASS_PREFIX_TO_ID:
+        return CLASS_PREFIX_TO_ID.get(prefix)
+    raise ValueError("incorrect file path name")
+
