@@ -16,14 +16,6 @@ from config import BASELINE_PATH, CLASS_PREFIX_TO_ID, DATA_DIR
 from pitch_detector import SmoothedPitchClassifier, pitch_only_label
 
 
-def truth_label(path):
-    stem = Path(path).stem
-    prefix = stem.split("_")[0]
-    if prefix in CLASS_PREFIX_TO_ID:
-        return CLASS_PREFIX_TO_ID.get(prefix)
-    raise ValueError("incorrect file path name")
-
-
 def expected_label(path):
     stem = Path(path).stem
     prefix = stem.split("_")[0]
@@ -45,9 +37,7 @@ def pitch_deltas(path, baseline):
 
 
 def eval_file(path, baseline):
-
     spc = SmoothedPitchClassifier()
-
     expected = expected_label(path)
     deltas = pitch_deltas(path, baseline)
     total = len(deltas)
@@ -56,10 +46,9 @@ def eval_file(path, baseline):
     for delta in deltas:
         baselinea = pitch_only_label(delta)
         baselineb = spc.predict(delta)
-
+        
         if baselinea == expected:
             a_correct += 1
-        
         if baselineb == expected:
             b_correct += 1
 
