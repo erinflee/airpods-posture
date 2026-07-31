@@ -32,10 +32,12 @@ CLASS_PREFIX_TO_ID = {
     "forward": 1,
     "dynamic": 2,
 }
+
 NUM_CLASSES = len(CLASS_PREFIX_TO_ID)
 
 # Tier 1 pitch threshold. Negative because chin-down = negative pitch.
-PITCH_SLOUCH_THRESHOLD = -0.15 # rad (-0.15 ≈ -8.6°)
+# before -0.15 -> too agressive, hard detect, make rotation smaller to consider "slouch"
+PITCH_SLOUCH_THRESHOLD = -0.10 # -0.10 rad = -5.7˚
 SMOOTHING_WINDOW = 5
 
 # Live daemon timing
