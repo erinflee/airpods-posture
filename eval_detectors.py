@@ -64,3 +64,33 @@ def eval_file(path, baseline):
             b_correct += 1
 
     return {"total": total, "a_correct": a_correct, "b_correct": b_correct}
+
+
+def main():
+    parser = argparse.ArgumentParser(description="This will determine slouch vs. no-slouch")
+    parser.add_argument("--data-dir", type=Path, default=DATA_DIR)
+    parser.add_argument("--baseline", type=Path, default=BASELINE_PATH)
+    args = parser.parse_args()
+
+    baseline = load_baseline(args.baseline)
+    csv_file = sorted(args.data_dir.glob("*.csv")) # glob("*.csv") -> grab all files ending in .csv
+    if not csv_file:
+        return 1
+    
+    a_correct_total = []
+    b_correct_total = []
+    n_total = []
+    for csv_path in csv_file:
+        result = eval_file(csv_path, baseline)
+        accuracy_a = result["a_correct"] / result["total"] * 100
+        accuracy_b = result["b_correct"] / result["total"] * 100
+        a_correct_total.append(result["a_correct"])
+        b_correct_total.append(result["b_correct"])
+        n_total.append(result["total"])
+        print(f"{csv_path}: Baseline A: {accuracy_a}%, Baseline B: {accuracy_b}%")
+
+    overall_a = sum(a_correct_total) / sum(n_total) * 100
+    overall_b = sum(b_correct_total) / sum(n_total) * 100
+
+    print(f"overall: Baseline A: {overall_a}%, Baseline B: {overall_b}%")
+    return 0
