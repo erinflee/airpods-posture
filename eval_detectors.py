@@ -13,7 +13,7 @@ from pathlib import Path
 
 from baseline import load_baseline
 from config import BASELINE_PATH, CLASS_PREFIX_TO_ID, DATA_DIR
-from pitch_director import SmoothedPitchClassifier, pitch_only_label
+from pitch_detector import SmoothedPitchClassifier, pitch_only_label
 
 
 def truth_label(path):
