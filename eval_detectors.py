@@ -43,3 +43,24 @@ def pitch_deltas(path, baseline):
 
     return deltas
 
+
+def eval_file(path, baseline):
+
+    spc = SmoothedPitchClassifier()
+
+    expected = expected_label(path)
+    deltas = pitch_deltas(path, baseline)
+    total = len(deltas)
+    a_correct = 0
+    b_correct = 0
+    for delta in deltas:
+        baselinea = pitch_only_label(delta)
+        baselineb = spc.predict(delta)
+
+        if baselinea == expected:
+            a_correct += 1
+        
+        if baselineb == expected:
+            b_correct += 1
+
+    return {"total": total, "a_correct": a_correct, "b_correct": b_correct}
