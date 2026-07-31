@@ -94,3 +94,7 @@ def main():
 
     print(f"overall: Baseline A: {overall_a}%, Baseline B: {overall_b}%")
     return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
