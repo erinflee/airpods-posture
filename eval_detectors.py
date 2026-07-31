@@ -23,3 +23,14 @@ def truth_label(path):
         return CLASS_PREFIX_TO_ID.get(prefix)
     raise ValueError("incorrect file path name")
 
+
+def pitch_deltas(path, baseline):
+    with open(path, 'r', encoding='utf-8') as file:
+        rows = list(csv.DictReader(file))
+
+    pitch_deltas = []
+    baseline_mean_pitch = baseline["mean"].get("pitch")
+    for row in rows:
+        pitch_deltas.append(row['pitch'] - baseline_mean_pitch)
+
+    return pitch_deltas
