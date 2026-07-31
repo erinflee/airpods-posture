@@ -24,6 +24,14 @@ def truth_label(path):
     raise ValueError("incorrect file path name")
 
 
+def expected_label(path):
+    stem = Path(path).stem
+    prefix = stem.split("_")[0]
+    if prefix != "forward":
+        return 0
+    return 1
+
+
 def pitch_deltas(path, baseline):
     with open(path, 'r', newline='', encoding='utf-8') as file:
         rows = list(csv.DictReader(file))
@@ -34,3 +42,4 @@ def pitch_deltas(path, baseline):
         deltas.append(float(row['pitch']) - baseline_mean_pitch)
 
     return deltas
+
