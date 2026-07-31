@@ -25,12 +25,12 @@ def truth_label(path):
 
 
 def pitch_deltas(path, baseline):
-    with open(path, 'r', encoding='utf-8') as file:
+    with open(path, 'r', newline='', encoding='utf-8') as file:
         rows = list(csv.DictReader(file))
 
-    pitch_deltas = []
+    deltas = []
     baseline_mean_pitch = baseline["mean"].get("pitch")
     for row in rows:
-        pitch_deltas.append(float(row['pitch']) - baseline_mean_pitch)
+        deltas.append(float(row['pitch']) - baseline_mean_pitch)
 
-    return pitch_deltas
+    return deltas
