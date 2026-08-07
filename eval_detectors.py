@@ -72,7 +72,8 @@ def main():
     b_correct_total = []
     n_total = []
     for csv_path in csv_file:
-        result = eval_file(csv_path, default_baseline)
+        baseline = baseline_for_csv(csv_path, default_baseline)
+        result = eval_file(csv_path, baseline)
         accuracy_a = result["a_correct"] / result["total"] * 100
         accuracy_b = result["b_correct"] / result["total"] * 100
         a_correct_total.append(result["a_correct"])
