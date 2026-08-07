@@ -1,5 +1,5 @@
 """
-Live posture daemon: motion -> classify -> alert. Run via AirpodsPosture.app.
+Live posture monitor: motion -> classify -> alert. Run via AirpodsPosture.app.
 
 The alert is a custom banner (banner.py) plus an afplay sound, both motion-safe.
 A real Notification Center banner isn't; see keepalive_test.py.
