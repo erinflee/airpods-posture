@@ -7,7 +7,7 @@ Notification Center and audio.
 
 Uses AppKit so the windows share the main-thread run loop that already drives
 motion callbacks: no second event loop, no cross-thread marshaling. All AppKit
-objects must be touched on the main thread; the daemon guarantees that.
+objects must be touched on the main thread; the monitor guarantees that.
 """
 
 import objc
@@ -115,7 +115,7 @@ class PostureBorder:
         self._visible = False
 
     def close(self):
-        """Tear down all windows on daemon shutdown."""
+        """Tear down all windows on monitor shutdown."""
         self.hide()
         for window in self._windows:
             window.close()
