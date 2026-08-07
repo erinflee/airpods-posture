@@ -63,6 +63,8 @@ def main():
 
     default_baseline = load_baseline(args.baseline)
     csv_file = sorted(args.data_dir.glob("*.csv")) # glob("*.csv") -> grab all files ending in .csv
+    csv_file = [p for p in csv_file if p.stem.split["_"][0] in CLASS_PREFIX_TO_ID]
+
     if not csv_file:
         return 1
     
