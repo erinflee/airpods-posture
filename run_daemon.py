@@ -7,11 +7,11 @@ A real Notification Center banner isn't; see keepalive_test.py.
 import subprocess
 import sys
 
-from mac_motion import HeadphoneMotionReader
-from detectors import SmoothedPitchClassifier
+from airpods_motion import HeadphoneMotionReader
+from pitch_detector import SmoothedPitchClassifier
 from baseline import load_baseline, apply_baseline
-from state_machine import PostureStateMachine
-from banner import PostureBanner
+from alert_timing import PostureStateMachine
+from alert_banner import PostureBanner
 from config import BASELINE_PATH, ALERT_SOUND
 
 
