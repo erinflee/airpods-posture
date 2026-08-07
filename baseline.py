@@ -11,6 +11,7 @@ Orientation is in radians; gravity in g.
 
 import json
 import statistics
+from pathlib import Path
 
 # Orientation + gravity define posture. Acceleration/rotationRate average ~0 at
 # rest, so they're excluded.
@@ -54,6 +55,21 @@ def load_baseline(path):
     with open(path, 'r', encoding='utf-8') as file:
         data = json.load(file)
     return data
+
+
+def baseline_for_csv(csv_path, fallback):
+    """Per-session baseline for a recording CSV.
+
+    label_NN.csv pairs with baseline_NN.json in the same directory (each
+    session calibrates first, so μ/σ reflect that sitting's chair and desk).
+    Returns the fallback baseline dict when no session file exists.
+    """
+    csv_path = Path(csv_path)
+    session = csv_path.stem.split("_")[-1]
+    candidate = csv_path.parent / f"baseline_{session}.json"
+    if candidate.exists():
+        return load_baseline(candidate)
+    return fallback
 
 
 def apply_baseline(sample, baseline):
