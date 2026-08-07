@@ -11,7 +11,7 @@ import csv
 import argparse
 from pathlib import Path
 
-from baseline import load_baseline
+from baseline import baseline_for_csv, load_baseline
 from config import BASELINE_PATH, CLASS_PREFIX_TO_ID, DATA_DIR
 from pitch_detector import SmoothedPitchClassifier, pitch_only_label
 
@@ -61,7 +61,7 @@ def main():
     parser.add_argument("--baseline", type=Path, default=BASELINE_PATH)
     args = parser.parse_args()
 
-    baseline = load_baseline(args.baseline)
+    default_baseline = load_baseline(args.baseline)
     csv_file = sorted(args.data_dir.glob("*.csv")) # glob("*.csv") -> grab all files ending in .csv
     if not csv_file:
         return 1
@@ -70,7 +70,7 @@ def main():
     b_correct_total = []
     n_total = []
     for csv_path in csv_file:
-        result = eval_file(csv_path, baseline)
+        result = eval_file(csv_path, default_baseline)
         accuracy_a = result["a_correct"] / result["total"] * 100
         accuracy_b = result["b_correct"] / result["total"] * 100
         a_correct_total.append(result["a_correct"])
