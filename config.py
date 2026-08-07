@@ -40,7 +40,7 @@ NUM_CLASSES = len(CLASS_PREFIX_TO_ID)
 PITCH_SLOUCH_THRESHOLD = -0.10 # -0.10 rad = -5.7˚
 SMOOTHING_WINDOW = 5
 
-# Live daemon timing
+# Live monitor timing
 INFERENCE_HZ = 2 # one sample per 0.5s
 SLOUCH_HOLD_S = 5
 MIN_GAP_ALERT_S = 3
