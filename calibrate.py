@@ -16,7 +16,7 @@ import time
 
 from baseline import mean_std_fields, save_baseline
 from config import BASELINE_PATH
-from mac_motion import HeadphoneMotionReader
+from airpods_motion import HeadphoneMotionReader
 
 
 def main():
