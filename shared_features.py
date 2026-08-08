@@ -35,6 +35,9 @@ def rows_to_windows(rows):
 		values.append(value)
 	data = np.array(values)
 
+	if len(data) < WINDOW_SIZE:
+		return np.empty((0, len(BASELINE_FIELDS), WINDOW_SIZE))
+	
 	windows = []
 	for start in range(0, len(data) - WINDOW_SIZE + 1, WINDOW_STRIDE):
 		window = data[start:start+WINDOW_SIZE].T
