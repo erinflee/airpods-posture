@@ -10,10 +10,12 @@ PyTorch Dataset
 import torch
 from torch.utils.data import Dataset
 from shared_features import load_labeled_windows
+from config import DATA_DIR, VAL_FRACTION
+import numpy as np
 
 
 class PostureWindowDataset(Dataset):
-  def __init__(self, x, y, ):
+  def __init__(self, x, y):
     self.x = torch.tensor(x, dtype=torch.float32)
     self.y = torch.tensor(y, dtype=torch.int64)
 
@@ -26,3 +28,11 @@ class PostureWindowDataset(Dataset):
     return x, y
 
 
+def build_datasets(data_dir=DATA_DIR, val_fraction=VAL_FRACTION):
+  X, y, sessions = load_labeled_windows(data_dir)
+  sorted_sessions = sorted(np.unique(sessions))
+  val_session = sorted_sessions[-1:]
+  mask = np.isin(sessions, val_session) # check each session against list val_sessions number, returns true or false if match
+  train_dataset = PostureWindowDataset(X[~mask], y[~mask])
+  val_dataset = PostureWindowDataset(X[mask], y[mask])
+  return train_dataset, val_dataset, val_session
