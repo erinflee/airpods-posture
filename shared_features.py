@@ -8,7 +8,7 @@ from pathlib import Path
 
 import numpy as np
 
-from baseline import baseline_for_csv, load_baseline, zscore
+from baseline import baseline_for_csv, load_baseline, zscore, BASELINE_FIELDS
 from config import CLASS_PREFIX_TO_ID, DATA_DIR, WINDOW_SIZE, WINDOW_STRIDE
 
 
@@ -26,4 +26,20 @@ def load_csv_rows(path, baseline=None):
 		rows = list(csv.DictReader(file))
 	return [{key: float(value) for key, value in row.items()} for row in rows]
 		
+
+def rows_to_windows(rows):
+	"""Sliding windows over rows -> (n_windows, channels, time) array."""
+	values = []
+	for row in rows:
+		value = [row[field] for field in BASELINE_FIELDS]
+		values.append(value)
+	data = np.array(values)
+
+	windows = []
+	for start in range(0, len(data) - WINDOW_SIZE + 1, WINDOW_STRIDE):
+		window = data[start:start+WINDOW_SIZE].T
+		windows.append(window)
+	return np.stack(windows)
+
+
 
