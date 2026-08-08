@@ -28,7 +28,7 @@ class PostureWindowDataset(Dataset):
     return x, y
 
 
-def build_datasets(data_dir=DATA_DIR, val_fraction=VAL_FRACTION):
+def build_datasets(data_dir=DATA_DIR): # add val_fraction=VAL_FRACTION once more session recordings exist
   X, y, sessions = load_labeled_windows(data_dir)
   sorted_sessions = sorted(np.unique(sessions))
   val_session = sorted_sessions[-1:]
