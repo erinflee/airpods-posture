@@ -46,6 +46,15 @@ def rows_to_windows(rows):
 
 
 def load_labeled_windows(data_dir=DATA_DIR):
+	"""All labeled CSVs in data_dir -> X, y training arrays.
+
+	Each file's rows are z-scored against its own session baseline
+	(baseline_NN.json), then cut into sliding windows. Files without a
+	class prefix (neutral_/forward_/dynamic_) are skipped.
+
+	Returns X (n_windows, channels, time) and y (n_windows,) class ids.
+	"""
+
 	default_baseline = load_baseline(BASELINE_PATH)
 	x_blocks = []
 	y_blocks = []
