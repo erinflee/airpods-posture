@@ -52,12 +52,13 @@ def load_labeled_windows(data_dir=DATA_DIR):
 	(baseline_NN.json), then cut into sliding windows. Files without a
 	class prefix (neutral_/forward_/dynamic_) are skipped.
 
-	Returns X (n_windows, channels, time) and y (n_windows,) class ids.
+	Returns X (n_windows, channels, time), y (n_windows,) class ids, session (n_windows,)
 	"""
 
 	default_baseline = load_baseline(BASELINE_PATH)
 	x_blocks = []
 	y_blocks = []
+	session_nums = []
 
 	for csv_path in sorted(Path(data_dir).glob("*.csv")):
 		if csv_path.stem.split("_")[0] not in CLASS_PREFIX_TO_ID:
@@ -73,6 +74,9 @@ def load_labeled_windows(data_dir=DATA_DIR):
 		label = label_from_filename(csv_path)
 		x_blocks.append(windows)
 		y_blocks.append(np.full(len(windows), label)) # how many = length of windows, filled with one of three labels
-
-	return np.concatenate(x_blocks), np.concatenate(y_blocks)
+		
+		num = int(csv_path.stem.split("_")[-1])
+		session_nums.append(np.full(len(windows), num))
+		
+	return np.concatenate(x_blocks), np.concatenate(y_blocks), np.concatenate(session_nums)
 	
