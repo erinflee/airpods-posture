@@ -9,7 +9,7 @@ from pathlib import Path
 import numpy as np
 
 from baseline import baseline_for_csv, load_baseline, zscore, BASELINE_FIELDS
-from config import CLASS_PREFIX_TO_ID, DATA_DIR, WINDOW_SIZE, WINDOW_STRIDE
+from config import CLASS_PREFIX_TO_ID, DATA_DIR, BASELINE_PATH, WINDOW_SIZE, WINDOW_STRIDE
 
 
 def label_from_filename(path):
@@ -45,4 +45,25 @@ def rows_to_windows(rows):
 	return np.stack(windows)
 
 
+def load_labeled_windows(data_dir=DATA_DIR):
+	default_baseline = load_baseline(BASELINE_PATH)
+	x_blocks = []
+	y_blocks = []
 
+	for csv_path in sorted(Path(data_dir).glob("*.csv")):
+		if csv_path.stem.split("_")[0] not in CLASS_PREFIX_TO_ID:
+			continue
+
+		rows = load_csv_rows(csv_path)
+		baseline = baseline_for_csv(csv_path, default_baseline)
+		zrows = [zscore(row, baseline) for row in rows]
+		windows = rows_to_windows(zrows)
+		if len(windows) == 0:
+			continue
+
+		label = label_from_filename(csv_path)
+		x_blocks.append(windows)
+		y_blocks.append(np.full(len(windows), label)) # how many = length of windows, filled with one of three labels
+
+	return np.concatenate(x_blocks), np.concatenate(y_blocks)
+	
