@@ -21,6 +21,7 @@ def label_from_filename(path):
   
 
 def load_csv_rows(path, baseline=None):
+	"""Read one recording CSV -> list of dicts with float values."""
 	with open(path, 'r', encoding='utf-8') as file:
 		rows = list(csv.DictReader(file))
 	return [{key: float(value) for key, value in row.items()} for row in rows]
