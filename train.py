@@ -55,6 +55,16 @@ def main():
 
   optimizer = torch.optim.Adam(params=model.parameters(), lr=LEARNING_RATE)
   criterion = nn.CrossEntropyLoss() # common loss for classification problems
- 
-  training_loss = train_one_epoch(model, train_dataloader, optimizer, criterion, device)
-  
+
+  best_acc = 0
+  for epoch in range(EPOCHS):
+    training_loss = train_one_epoch(model, train_dataloader, optimizer, criterion, device)
+    val_acc = evaluate(model, val_dataloader, device)
+    print(f"epoch: {epoch + 1:02d}  loss={training_loss:.4f} val_acc={val_acc:.3f}")
+
+    if val_acc > best_acc:
+      best_acc = val_acc
+      torch.save(model.state_dict(), MODEL_PATH)
+
+  print(f"best val_acc={best_acc:.3f}  saved to {MODEL_PATH}")
+  return 0
