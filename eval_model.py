@@ -23,3 +23,13 @@ CLASS_NAMES = list(CLASS_PREFIX_TO_ID)          # ["neutral", "forward", "dynami
 FORWARD = CLASS_PREFIX_TO_ID["forward"]
 PITCH_CHANNEL = BASELINE_FIELDS.index("pitch")  # channel order matches rows_to_windows
 
+
+def cnn_predictions(val):
+    """Class id per window from the saved weights. One forward pass, no grad."""
+    model = PostureCNN()
+    model.load_state_dict(torch.load(MODEL_PATH, map_location="cpu"))
+    model.eval()
+    with torch.no_grad():
+        return model(val.x).argmax(dim=1).numpy()
+
+
