@@ -69,3 +69,8 @@ def print_confusion(counts):
         recall = counts[actual, actual] / n_actual if n_actual else 0.0
         print(f"{actual_name:{column_width}s}{row_text}   {recall:.3f}")
 
+
+def forward_vs_not_accuracy(y_true, y_pred):
+    """Accuracy on the binary question the alert timer actually asks."""
+    return np.mean((y_pred == FORWARD) == (y_true == FORWARD))
+
