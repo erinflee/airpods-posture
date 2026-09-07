@@ -74,3 +74,26 @@ def forward_vs_not_accuracy(y_true, y_pred):
     """Accuracy on the binary question the alert timer actually asks."""
     return np.mean((y_pred == FORWARD) == (y_true == FORWARD))
 
+
+def main():
+    _, val, held_out = build_datasets(DATA_DIR)
+    session = int(held_out[0])
+    y_true = val.y.numpy()
+    print(f"held-out session: {session}  ({len(y_true)} windows)\n")
+
+    cnn = cnn_predictions(val)
+    print("CNN confusion (rows = true, cols = predicted)")
+    print_confusion(confusion_matrix(y_true, cnn, len(CLASS_NAMES)))
+    print(f"\nCNN 3-class accuracy:      {np.mean(cnn == y_true):.3f}")
+    print(f"CNN forward vs not:        {forward_vs_not_accuracy(y_true, cnn):.3f}")
+
+    tier1 = tier1_predictions(val, session)
+    print(f"Tier 1 forward vs not:     {forward_vs_not_accuracy(y_true, tier1):.3f}")
+    for class_id, name in enumerate(CLASS_NAMES):
+        mask = y_true == class_id
+        print(f"  Tier 1 flags forward on {name:8s}: {np.mean(tier1[mask] == FORWARD):.3f}")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
