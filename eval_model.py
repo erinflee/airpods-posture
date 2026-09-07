@@ -56,3 +56,16 @@ def confusion_matrix(actual_labels, predicted_labels, n_classes):
         counts[actual, predicted] += 1
     return counts
 
+
+def print_confusion(counts):
+    """Print counts as a table: one row per actual class, one column per predicted class."""
+    column_width = 9
+    header = " " * column_width + "".join(f"{name:>{column_width}s}" for name in CLASS_NAMES) + "   recall"
+    print(header)
+    for actual, actual_name in enumerate(CLASS_NAMES):
+        row_counts = counts[actual]
+        row_text = "".join(f"{count:{column_width}d}" for count in row_counts)
+        n_actual = row_counts.sum()
+        recall = counts[actual, actual] / n_actual if n_actual else 0.0
+        print(f"{actual_name:{column_width}s}{row_text}   {recall:.3f}")
+
