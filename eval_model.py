@@ -10,7 +10,6 @@ Evaluate the trained CNN against the Tier 1 threshold on the held-out session.
 """
 
 import sys
-
 import numpy as np
 import torch
 
@@ -44,3 +43,16 @@ def tier1_predictions(val, session):
     pitch_delta = val.x[:, PITCH_CHANNEL, :].numpy() * sigma
     forward = pitch_delta.mean(axis=1) < PITCH_SLOUCH_THRESHOLD
     return np.where(forward, FORWARD, CLASS_PREFIX_TO_ID["neutral"])
+
+
+def confusion_matrix(actual_labels, predicted_labels, n_classes):
+    """counts[actual, predicted] = number of windows with that (actual, predicted) pair.
+
+    Rows are the true class, columns are what the model said. The diagonal is
+    correct predictions; everything off the diagonal is a specific kind of mistake.
+    """
+    counts = np.zeros((n_classes, n_classes), dtype=int)
+    for actual, predicted in zip(actual_labels, predicted_labels):
+        counts[actual, predicted] += 1
+    return counts
+
