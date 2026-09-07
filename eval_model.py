@@ -33,3 +33,14 @@ def cnn_predictions(val):
         return model(val.x).argmax(dim=1).numpy()
 
 
+def tier1_predictions(val, session):
+    """Tier 1 label per window: mean raw pitch delta past the threshold.
+
+    Windows hold z-scored pitch, so multiply by the session's sigma (floored
+    the same way zscore() floors it) to get radians back.
+    """
+    baseline = load_baseline(DATA_DIR / f"baseline_{session:02d}.json")
+    sigma = max(baseline["std"]["pitch"], SIGMA_FLOOR)
+    pitch_delta = val.x[:, PITCH_CHANNEL, :].numpy() * sigma
+    forward = pitch_delta.mean(axis=1) < PITCH_SLOUCH_THRESHOLD
+    return np.where(forward, FORWARD, CLASS_PREFIX_TO_ID["neutral"])
