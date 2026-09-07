@@ -8,3 +8,18 @@ Evaluate the trained CNN against the Tier 1 threshold on the held-out session.
   - Tier 1 on the same windows: undo the pitch z-score, mean over the window,
     apply PITCH_SLOUCH_THRESHOLD
 """
+
+import sys
+
+import numpy as np
+import torch
+
+from baseline import BASELINE_FIELDS, SIGMA_FLOOR, load_baseline
+from config import CLASS_PREFIX_TO_ID, DATA_DIR, MODEL_PATH, PITCH_SLOUCH_THRESHOLD
+from dataset import build_datasets
+from model import PostureCNN
+
+CLASS_NAMES = list(CLASS_PREFIX_TO_ID)          # ["neutral", "forward", "dynamic"]
+FORWARD = CLASS_PREFIX_TO_ID["forward"]
+PITCH_CHANNEL = BASELINE_FIELDS.index("pitch")  # channel order matches rows_to_windows
+
