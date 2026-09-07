@@ -3,6 +3,7 @@ Training loop
 
 """
 
+import sys
 import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
@@ -68,3 +69,7 @@ def main():
 
   print(f"best val_acc={best_acc:.3f}  saved to {MODEL_PATH}")
   return 0
+
+
+if __name__ == "__main__":
+  sys.exit(main())
