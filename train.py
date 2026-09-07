@@ -29,6 +29,20 @@ def train_one_epoch(model, loader, optimizer, criterion, device):
   return total_loss / len(loader.dataset)
 
 
+def evaluate(model, loader, device):
+  correct = 0
+  model.eval()
+
+  with torch.no_grad():
+    for X, y in loader:
+      X, y = X.to(device), y.to(device)
+      output = model(X)
+      preds = output.argmax(dim=1)
+      correct += (preds == y).sum().item()
+    
+  return correct / len(loader.dataset)
+
+
 def main():
 
   train, val, session = build_datasets(DATA_DIR)
@@ -42,4 +56,5 @@ def main():
   optimizer = torch.optim.Adam(params=model.parameters(), lr=LEARNING_RATE)
   criterion = nn.CrossEntropyLoss() # common loss for classification problems
  
-  train_one_epoch(model, train_dataloader, optimizer, criterion, device)
+  training_loss = train_one_epoch(model, train_dataloader, optimizer, criterion, device)
+  
