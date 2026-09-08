@@ -17,3 +17,17 @@ from baseline import BASELINE_FIELDS
 from config import MODEL_PATH, WINDOW_SIZE, WINDOW_STRIDE
 from model import PostureCNN
 
+
+class CNNClassifier:
+    """Rolling-window CNN classifier. predict() takes a z-scored sample dict."""
+
+    def __init__(self, weights_path=MODEL_PATH, window=WINDOW_SIZE, stride=WINDOW_STRIDE):
+        self._model = PostureCNN()
+        self._model.load_state_dict(torch.load(weights_path, map_location="cpu"))
+        self._model.eval()
+
+        self._buffer = []
+        self._window = window
+        self._stride = stride
+        self._since_last = 0
+        self._label = 0  # neutral until the buffer fills
