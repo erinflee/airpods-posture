@@ -86,20 +86,20 @@ This is the non-negotiable for the cross-user claim. Random cross-validation on 
 
 Work through these in order. Check items off as you go.
 
-> **Status (code vs. checklist).** The checklist tracks *tasks* (build / tune / record / test), most of which need real AirPods or recorded data. Code already written and verified offline: `mac_motion.py`, `config.py`, `baseline.py`, `calibrate.py`, `notify.py`, `detectors.py` (Tier 1), `state_machine.py`, `run_daemon.py`. Still stubs: `record_mac.py`, `eval_detectors.py`, `features.py`, `inspect_data.py`, `dataset.py`, `model.py`, `train.py`. Nothing has been run on hardware yet, so the tune/record/test items below stay unchecked.
+> **Status (September 2026).** Every script is written and has been run: the sensor path, calibration, recording, the Tier 1 threshold, the live monitor with banner alert, and the Tier 3 CNN with a session-based train/test split. Data is two sessions from one subject. Tier 2 was skipped. Numbers live in `results/RESULTS.md`. What has not been done is the multi-subject part: no friends recorded, so LOSO is untested and the cross-user claim is future work. Some filenames below differ from the code (`detectors.py` is `pitch_detector.py`, `state_machine.py` is `alert_timing.py`, `notify.py` is `alert_banner.py`, `features.py` is `shared_features.py`, `mac_motion.py` is `airpods_motion.py`).
 
 ### 1. Sensor & calibration
 
 - [x] Build `AirpodsPosture.app` (`./scripts/build_app.sh`)
-- [ ] `record_mac.py` — log motion to CSV via the bundle
-- [x] `calibrate.py` + `baseline.py` — ~10 s neutral baseline → `baseline.json` (per-axis μ and σ) *(code done + unit-tested; `baseline.json` not yet generated on real AirPods)*
-- [ ] Optional: `inspect_stream.py` — sample rate, live feature summary
+- [x] `record_mac.py` — log motion to CSV via the bundle
+- [x] `calibrate.py` + `baseline.py` — ~10 s neutral baseline → `baseline.json` (per-axis μ and σ)
+- [x] Optional: `inspect_stream.py` — sample rate, live feature summary *(covered by `airpods_motion.py`'s `__main__` block: ~47 Hz)*
 
 ### 2. Tier 1 — threshold detector (ships day one)
 
-- [ ] Tune `PITCH_SLOUCH_THRESHOLD` (radians) + `SMOOTHING_WINDOW` in `config.py` against your own neutral
-- [ ] `eval_detectors.py` — confirm the pitch-delta threshold separates forward-flexion from neutral
-- [ ] Document its failure modes
+- [x] Tune `PITCH_SLOUCH_THRESHOLD` (radians) + `SMOOTHING_WINDOW` in `config.py` against your own neutral *(−0.10 rad; −0.15 was too strict)*
+- [x] `eval_detectors.py` — confirm the pitch-delta threshold separates forward-flexion from neutral *(95.7% per frame; 78% on `forward_02`)*
+- [x] Document its failure modes *(see `results/RESULTS.md`: high-variance forward sessions drift above a fixed line)*
 
 **Known limit:** the 15 s hold timer filters *quick* glances, but a slow sip or a 5–10 s look-down still reads as flexion to a pure pitch threshold and will false-fire. That residual false-positive rate is what motivates Tiers 2–3 (the `dynamic` class), and it's measured here rather than assumed away by the timer.
 
@@ -113,11 +113,13 @@ Record **~5 min per class**, Mac-native via the bundle. One CSV per session. **E
 | 1     | Forward flexion | Your real sustained head-down lean — held steadily          |
 | 2     | Dynamic         | Drink, stretch, glance down 2–3 s, normal motion            |
 
-- [ ] `neutral_01.csv`, `forward_01.csv`, `dynamic_01.csv` per subject
-- [ ] **5–10 subjects** (friends) — this is what makes the shared model generalize
-- [ ] Run `inspect_data.py` — confirm neutral vs forward-flexion separable after z-scoring
+- [x] `neutral_01.csv`, `forward_01.csv`, `dynamic_01.csv` per subject *(two sessions, one subject)*
+- [ ] **5–10 subjects** (friends) — this is what makes the shared model generalize *(not done; future work)*
+- [x] Run `inspect_data.py` — confirm neutral vs forward-flexion separable after z-scoring
 
 ### 4. Tier 2 — classical model (does it beat the threshold?)
+
+**Skipped.** With one subject the tier ladder has nothing to discriminate on, and the CNN was the part worth learning. Revisit if multi-subject data ever exists.
 
 - [ ] `features.py` — extract z-score-normalized time-domain features per window
 - [ ] Train a Random Forest / SVM on the **pooled** normalized features
@@ -126,20 +128,21 @@ Record **~5 min per class**, Mac-native via the bundle. One CSV per session. **E
 
 ### 5. Tier 3 — deep model (only if Tier 2 struggles on dynamic motion)
 
-- [ ] `train.py` — 1D-CNN / GRU on z-scored raw windows → `weights/posture_model.pth`
-- [ ] **LOSO** again — compare against Tier 1 and Tier 2 on held-out subjects
-- [ ] Decision: ship the simplest tier that wins
+- [x] `train.py` — 1D-CNN / GRU on z-scored raw windows → `weights/posture_model.pth`
+- [x] **LOSO** again — compare against Tier 1 and Tier 2 on held-out subjects *(leave-one-session-out, not subject: CNN 97.7% vs threshold 92.2% on forward-vs-not, `eval_model.py`)*
+- [x] Decision: ship the simplest tier that wins *(threshold ships; the CNN wins on one held-out session but that is not enough evidence to replace a rule you can explain in one sentence)*
 
-### 6. Live daemon
+### 6. Live monitor
 
-- [ ] Test `run_daemon.py` via the bundle
-- [ ] Tune `state_machine.py` — 15 s flexion hold, 60 s cooldown, neutral resets timer
-- [ ] Confirm: forward flexion 15+ s → one notification; drinking / brief look-downs don't spam alerts
+- [x] Test `run_monitor.py` via the bundle
+- [x] Tune `state_machine.py` — 15 s flexion hold, 60 s cooldown, neutral resets timer
+- [ ] Confirm: forward flexion 15+ s → one notification; drinking / brief look-downs don't spam alerts *(run once with the 15 s / 60 s values)*
+- [x] Found: a real Notification Center banner kills the motion stream. Alert is a self-drawn AppKit banner + `afplay` instead (`keepalive_test.py`)
 
 ### 7. Wrap up
 
-- [ ] Finish README as a documented **developer tool** (build, calibrate, run; clean API)
-- [ ] Results page: threshold vs Tier 2 vs Tier 3 under **LOSO**, confusion matrices, worst-subject, CPU cost, known limits (head-only, no torso)
+- [x] Finish README as a documented **developer tool** (build, calibrate, run; clean API)
+- [x] Results page: threshold vs Tier 3 on the held-out session, confusion matrix, known limits (`results/RESULTS.md`; no LOSO, no worst-subject, no CPU cost)
 - [ ] Technical write-up + 2-min demo
 
 ---
@@ -151,9 +154,9 @@ AirPods (IMU) — connected to Mac
     ↓
 CMHeadphoneMotionManager (macOS 14+)
     ↓
-AirpodsPosture.app → Python daemon
+AirpodsPosture.app → Python monitor
     ├── record_mac.py      (data collection — Tiers 2-3 only)
-    ├── run_daemon.py      (live inference)
+    ├── run_monitor.py      (live inference)
     ├── calibrate → baseline.json (μ, σ) → rolling buffer → Tier 1 threshold (or model)
     ├── state machine (hold / reset / cooldown)
     └── osascript → Notification Center
@@ -173,7 +176,7 @@ The default inference path is the **Tier 1 threshold**. A shared model is swappe
 | `AirpodsPosture.app`        | Carries `NSMotionUsageDescription`; run scripts through it |
 | Motion & Fitness permission | Granted on first bundle launch                             |
 
-**For other users:** clone repo → `./scripts/build_app.sh` → **one-time ~10 s calibrate** → run daemon via bundle. **No training required** — calibration alone personalizes the detector (the model, if any, ships as frozen shared weights). (Re-calibrate if setup changes.)
+**For other users:** clone repo → `./scripts/build_app.sh` → **one-time ~10 s calibrate** → run monitor via bundle. **No training required** — calibration alone personalizes the detector (the model, if any, ships as frozen shared weights). (Re-calibrate if setup changes.)
 
 ---
 
@@ -191,8 +194,8 @@ The default inference path is the **Tier 1 threshold**. A shared model is swappe
 ```bash
 ./scripts/build_app.sh
 AirpodsPosture.app/Contents/MacOS/launch calibrate.py
-# then run the daemon (no training step needed)
-AirpodsPosture.app/Contents/MacOS/launch run_daemon.py
+# then run the monitor (no training step needed)
+AirpodsPosture.app/Contents/MacOS/launch run_monitor.py
 ```
 
 `baseline.json` is per-user and gitignored — not shipped in the repo.
@@ -213,7 +216,7 @@ The shared model does **not** learn anyone's personal angles. After per-user z-s
 | **Forward flexion** | The sustained head-down lean you'd want a nudge about — chin forward/down, **held steadily** | A quick look at the keyboard, or an exaggerated "stare at lap" pose |
 | **Dynamic** | Short intentional moves: sip, stretch, pick something up, glance at phone, look down 2–3 s then sit back | Sustained flexion (that's the forward class) |
 
-Looking down at a laptop is fine in **neutral** if that's your normal desk angle. The daemon only alerts after **15 s** of sustained flexion, so brief look-downs shouldn't spam notifications once **dynamic** is in the training set.
+Looking down at a laptop is fine in **neutral** if that's your normal desk angle. The monitor only alerts after **15 s** of sustained flexion, so brief look-downs shouldn't spam notifications once **dynamic** is in the training set.
 
 ### Session order
 
@@ -241,7 +244,7 @@ scripts/build_app.sh     # builds AirpodsPosture.app
 
 ```bash
 ./scripts/build_app.sh
-open -a AirpodsPosture.app --args run_daemon.py
+open -a AirpodsPosture.app --args run_monitor.py
 ```
 
 Edit the permission message in `packaging/Info.plist`, then rebuild. `LSUIElement` is set — no dock icon. The `.app` exists **only** to carry the motion permission — it is not a product UI.
@@ -274,7 +277,7 @@ airpods-posture/
 ├── eval_detectors.py
 ├── train.py                  # Tier 3 (deep)
 ├── state_machine.py
-├── run_daemon.py
+├── run_monitor.py
 ├── notify.py
 ├── data/
 ├── weights/
