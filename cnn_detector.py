@@ -31,3 +31,24 @@ class CNNClassifier:
         self._stride = stride
         self._since_last = 0
         self._label = 0  # neutral until the buffer fills
+
+
+    def predict(self, zsample):
+        """Class id (0 neutral / 1 forward / 2 dynamic) for the latest sample."""
+        self._buffer.append([zsample[field] for field in BASELINE_FIELDS])
+        self._buffer = self._buffer[-self._window:]  # keep only the last WINDOW_SIZE samples
+        self._since_last += 1
+
+        if len(self._buffer) < self._window:
+            return self._label
+        if self._since_last < self._stride:
+            return self._label
+
+        self._since_last = 0
+        # (time, channels) -> (1, channels, time), same layout as rows_to_windows
+        x = torch.tensor(self._buffer, dtype=torch.float32).T.unsqueeze(0)
+        with torch.no_grad():
+            self._label = int(self._model(x).argmax(dim=1))
+        return self._label
+
+   
