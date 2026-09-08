@@ -42,8 +42,8 @@ SMOOTHING_WINDOW = 5
 
 # Live monitor timing
 INFERENCE_HZ = 2 # one sample per 0.5s
-SLOUCH_HOLD_S = 5
-MIN_GAP_ALERT_S = 3
+SLOUCH_HOLD_S = 15 # forward held this long before an alert
+MIN_GAP_ALERT_S = 60 # cooldown before next alert
 
 # Banner alert. We draw our own; a real Notification Center banner kills motion.
 BANNER_WIDTH = 360      # points
