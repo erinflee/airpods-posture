@@ -5,7 +5,7 @@ A real Notification Center banner kills the AirPods motion stream, so we
 recreate the look (frosted top-right panel) with a plain window instead. Cost:
 it won't show up in Notification Center history.
 
-Like alert_border.py: touch all AppKit objects on the main thread. The monitor's
+Touch all AppKit objects on the main thread. The monitor's
 motion callbacks run on the main queue, so show()/hide() are called from there.
 """
 
