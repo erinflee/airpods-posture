@@ -13,8 +13,9 @@ from pathlib import Path
 
 import matplotlib.pyplot as plt
 from statistics import fmean, pstdev
-from baseline import load_baseline
+from baseline import load_baseline, baseline_for_csv
 from config import BASELINE_PATH, DATA_DIR, CLASS_PREFIX_TO_ID, ROOT
+
 
 def load_csv(csv_path):
     with open(csv_path, 'r', newline="", encoding="utf-8") as file:
@@ -96,14 +97,17 @@ def main():
     parser.add_argument("--plot", action="store_true", help="Save pitch/roll PNGs to results/")
     args = parser.parse_args()
 
-    baseline = load_baseline(args.baseline)
+    default_baseline = load_baseline(args.baseline)
     csv_files = sorted(args.data_dir.glob("*.csv"))
+    csv_files = [p for p in csv_files if p.stem.split("_")[0] in CLASS_PREFIX_TO_ID]
+
     if not csv_files:
         print(f"No CSV files in {args.data_dir}", file=sys.stderr)
         return 1
 
     delta_pitch_by_label = {}
     for csv_path in csv_files:
+        baseline = baseline_for_csv(csv_path, default_baseline)
         stats = summarize_file(csv_path, baseline)
         print(
             f"{csv_path.name}: "
