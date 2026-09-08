@@ -51,4 +51,8 @@ class CNNClassifier:
             self._label = int(self._model(x).argmax(dim=1))
         return self._label
 
-   
+    def reset(self):
+        """Clear the window between sessions."""
+        self._buffer = []
+        self._since_last = 0
+        self._label = 0
