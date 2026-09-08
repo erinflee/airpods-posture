@@ -10,3 +10,10 @@ stays cheap.
 Opt-in via `run_monitor.py --detector cnn`. Validated on one held-out session
 from one subject, see results/RESULTS.md.
 """
+
+import torch
+
+from baseline import BASELINE_FIELDS
+from config import MODEL_PATH, WINDOW_SIZE, WINDOW_STRIDE
+from model import PostureCNN
+
