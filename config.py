@@ -45,10 +45,6 @@ INFERENCE_HZ = 2 # one sample per 0.5s
 SLOUCH_HOLD_S = 5
 MIN_GAP_ALERT_S = 3
 
-# Screen-edge border alert
-BORDER_THICKNESS = 14 # points
-BORDER_COLOR = (0.85, 0.1, 0.1, 0.92) # RGBA 0-1, translucent red
-
 # Banner alert. We draw our own; a real Notification Center banner kills motion.
 BANNER_WIDTH = 360      # points
 BANNER_HEIGHT = 88
